@@ -1,4 +1,3 @@
-// Redirects unauthenticated users to Auth0 login
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, type ReactNode } from "react";
 
@@ -14,7 +13,15 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-400 text-lg">Loading...</p>
+        <div className="flex gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-2 h-2 rounded-full bg-zinc-500 animate-pulse"
+              style={{ animationDelay: `${i * 200}ms` }}
+            />
+          ))}
+        </div>
       </div>
     );
   }
