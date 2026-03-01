@@ -18,7 +18,11 @@ export async function apiFetch<T>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${env.API_URL}${path}`, { ...init, headers });
+  const res = await fetch(`${env.API_URL}${path}`, {
+    ...init,
+    headers,
+    credentials: "include",
+  });
 
   if (!res.ok) {
     const body = await res.json().catch(() => null);

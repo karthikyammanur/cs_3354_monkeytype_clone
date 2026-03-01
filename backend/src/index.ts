@@ -25,9 +25,10 @@ app.use(
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   })
 );
+const allowedOrigins = env.CORS_ORIGIN.split(",").map((s) => s.trim());
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
