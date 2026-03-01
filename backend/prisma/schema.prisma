@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String       @id @default(uuid())
+  auth0Id     String       @unique @map("auth0_id")
+  email       String       @unique
+  username    String       @unique
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  typingTests TypingTest[]
+
+  @@map("users")
+}
+
+model TypingTest {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wpm          Decimal
+  accuracy     Decimal
+  duration     Int
+  totalChars   Int      @map("total_chars")
+  correctChars Int      @map("correct_chars")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("typing_tests")
+}
+
+model Word {
+  id   Int    @id @default(autoincrement())
+  word String @unique
+
+  @@map("word_bank")
+}

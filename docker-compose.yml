@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: typeshi
+      POSTGRES_PASSWORD: typeshi
+      POSTGRES_DB: typeshi
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - typeshi-network
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - typeshi-network
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+    networks:
+      - typeshi-network
+
+networks:
+  typeshi-network:
+    driver: bridge
+
+volumes:
+  pgdata:
