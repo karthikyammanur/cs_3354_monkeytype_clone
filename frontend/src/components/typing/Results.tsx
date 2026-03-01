@@ -15,12 +15,12 @@ interface ResultsProps {
 
 export function Results({ wpm, accuracy, totalChars, correctChars, duration, saveStatus, onRestart, onLogin }: ResultsProps) {
   return (
-    <div className="flex flex-col items-center gap-8">
-      <div className="flex items-end gap-12">
+    <div className="flex flex-col items-center gap-8 animate-fade-in">
+      <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 sm:gap-12">
         <div className="flex flex-col items-center">
           <span className="text-zinc-500 text-sm uppercase tracking-wider mb-1">wpm</span>
           <span
-            className="text-6xl font-semibold text-amber-400"
+            className="text-5xl sm:text-6xl font-semibold text-amber-400"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             {wpm}
@@ -29,7 +29,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
         <div className="flex flex-col items-center">
           <span className="text-zinc-500 text-sm uppercase tracking-wider mb-1">accuracy</span>
           <span
-            className="text-4xl font-semibold text-emerald-400"
+            className="text-3xl sm:text-4xl font-semibold text-emerald-400"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             {accuracy}%
@@ -37,7 +37,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
         </div>
       </div>
 
-      <div className="flex gap-8 text-sm text-zinc-500" style={{ fontFamily: "var(--font-mono)" }}>
+      <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-zinc-500" style={{ fontFamily: "var(--font-mono)" }}>
         <span>characters: <span className="text-zinc-300">{correctChars}</span>/{totalChars}</span>
         <span>time: <span className="text-zinc-300">{duration}s</span></span>
       </div>
@@ -54,7 +54,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
         )}
         {saveStatus === "guest" && (
           <p className="text-xs text-zinc-600">
-            <button onClick={onLogin} className="text-zinc-400 hover:text-zinc-200 underline underline-offset-2 transition-colors">
+            <button onClick={onLogin} className="text-zinc-400 hover:text-zinc-200 underline underline-offset-2 transition-colors cursor-pointer">
               sign in
             </button>
             {" "}to save your results
@@ -62,10 +62,10 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
         )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap justify-center items-center gap-4">
         <button
           onClick={onRestart}
-          className="px-6 py-2 rounded text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 transition-colors"
+          className="px-6 py-2 rounded text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-zinc-600"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           restart

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useApiClient } from "../api/client.ts";
 import { useTypingTest } from "../hooks/useTypingTest.ts";
@@ -20,6 +20,8 @@ export function Home() {
     totalChars,
     correctChars,
     charStatuses,
+    isLoading,
+    error,
     restart,
     setDuration,
     handleKeyPress,
@@ -45,11 +47,11 @@ export function Home() {
       .catch(() => setSaveStatus("error"));
   }, [isFinished, isAuthenticated, api, wpm, accuracy, duration, totalChars, correctChars]);
 
-  const handleRestart = () => {
+  const handleRestart = useCallback(() => {
     savedRef.current = false;
     setSaveStatus("idle");
     restart();
-  };
+  }, [restart]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -96,22 +98,47 @@ export function Home() {
         />
       ) : (
         <>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             <TimerSelector selected={duration} isActive={isActive} onSelect={setDuration} />
             <Timer timeRemaining={timeRemaining} isActive={isActive} isFinished={isFinished} />
           </div>
 
           <div className="w-full max-w-3xl">
-            <TypingArea
-              currentText={currentText}
-              currentIndex={currentIndex}
-              charStatuses={charStatuses}
-              isActive={isActive}
-              isFinished={isFinished}
-            />
+            {isLoading ? (
+              <div className="flex items-center justify-center h-[120px]">
+                <div className="flex gap-1">
+                  {[0, 1, 2].map((i) => (
+                    <div
+                      key={i}
+                      className="w-2 h-2 rounded-full bg-zinc-600 animate-pulse"
+                      style={{ animationDelay: `${i * 200}ms` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center h-[120px] gap-3">
+                <p className="text-red-400/80 text-sm" style={{ fontFamily: "var(--font-mono)" }}>{error}</p>
+                <button
+                  onClick={restart}
+                  className="text-sm px-4 py-1.5 rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors cursor-pointer"
+                  style={{ fontFamily: "var(--font-mono)" }}
+                >
+                  retry
+                </button>
+              </div>
+            ) : (
+              <TypingArea
+                currentText={currentText}
+                currentIndex={currentIndex}
+                charStatuses={charStatuses}
+                isActive={isActive}
+                isFinished={isFinished}
+              />
+            )}
           </div>
 
-          {!isActive && (
+          {!isActive && !isLoading && !error && (
             <p className="text-zinc-600 text-sm" style={{ fontFamily: "var(--font-mono)" }}>
               start typing to begin
             </p>

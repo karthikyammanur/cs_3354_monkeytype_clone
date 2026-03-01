@@ -9,11 +9,11 @@ export function Timer({ timeRemaining, isActive, isFinished }: TimerProps) {
 
   return (
     <div
-      className={`text-3xl font-semibold tabular-nums transition-colors ${
+      className={`text-3xl font-semibold tabular-nums transition-colors duration-300 ${
         isFinished
           ? "text-zinc-600"
           : isLow
-            ? "text-amber-400"
+            ? "text-red-400"
             : isActive
               ? "text-amber-400"
               : "text-zinc-500"
