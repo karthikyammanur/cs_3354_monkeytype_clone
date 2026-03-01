@@ -22,11 +22,23 @@ export function useTypingTest() {
   const [totalChars, setTotalChars] = useState(0);
   const [correctChars, setCorrectChars] = useState(0);
   const [charStatuses, setCharStatuses] = useState<CharStatus[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isActiveRef = useRef(false);
+  const startTimeRef = useRef<number>(0);
+
+  const clearTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
 
   const fetchWords = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       const data = await publicFetch<WordsResponse>("/words?count=200");
       const text = data.words.join(" ");
@@ -34,7 +46,12 @@ export function useTypingTest() {
       setCurrentText(text);
       setCharStatuses(new Array(text.length).fill("pending"));
     } catch (e) {
-      console.error("Failed to fetch words:", e);
+      setError((e as Error).message || "Failed to load words");
+      setWords([]);
+      setCurrentText("");
+      setCharStatuses([]);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -42,27 +59,27 @@ export function useTypingTest() {
     fetchWords();
   }, [fetchWords]);
 
-  const endTest = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
+  const endTest = useCallback((elapsedOverride?: number) => {
+    clearTimer();
     setIsActive(false);
     isActiveRef.current = false;
     setIsFinished(true);
 
+    const elapsed = elapsedOverride ?? duration;
+
     setTotalChars((prevTotal) => {
       setCorrectChars((prevCorrect) => {
-        setWpm(calculateWPM(prevCorrect, duration));
+        setWpm(calculateWPM(prevCorrect, elapsed));
         setAccuracy(calculateAccuracy(prevCorrect, prevTotal));
         return prevCorrect;
       });
       return prevTotal;
     });
-  }, [duration]);
+  }, [duration, clearTimer]);
 
   const startTimer = useCallback(() => {
     if (intervalRef.current) return;
+    startTimeRef.current = Date.now();
     intervalRef.current = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
@@ -118,17 +135,19 @@ export function useTypingTest() {
           setCorrectChars((c) => c + 1);
         }
 
+        if (prev + 1 >= text.length) {
+          const elapsed = Math.max(1, Math.round((Date.now() - startTimeRef.current) / 1000));
+          setTimeout(() => endTest(elapsed), 0);
+        }
+
         return text;
       });
       return prev + 1;
     });
-  }, [startTimer]);
+  }, [startTimer, endTest]);
 
   const restart = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
+    clearTimer();
     setTyped("");
     setCurrentIndex(0);
     setIsActive(false);
@@ -139,8 +158,9 @@ export function useTypingTest() {
     setAccuracy(0);
     setTotalChars(0);
     setCorrectChars(0);
+    startTimeRef.current = 0;
     fetchWords();
-  }, [duration, fetchWords]);
+  }, [duration, fetchWords, clearTimer]);
 
   const setDuration = useCallback((seconds: number) => {
     if (isActiveRef.current) return;
@@ -149,12 +169,8 @@ export function useTypingTest() {
   }, []);
 
   useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
+    return () => clearTimer();
+  }, [clearTimer]);
 
   return {
     words,
@@ -170,6 +186,8 @@ export function useTypingTest() {
     totalChars,
     correctChars,
     charStatuses,
+    isLoading,
+    error,
     restart,
     setDuration,
     handleKeyPress,
