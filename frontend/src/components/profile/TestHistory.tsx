@@ -12,12 +12,12 @@ interface TestHistoryProps {
 export function TestHistory({ tests, pagination, onPageChange, isLoading }: TestHistoryProps) {
   if (!isLoading && tests.length === 0) {
     return (
-      <div className="text-center py-16 rounded-lg border border-zinc-800/50 bg-zinc-900/20">
+      <div className="text-center py-16 rounded-lg border border-[#1a1a1a] bg-[#141414]/50">
         <p className="text-zinc-400 text-lg mb-2" style={{ fontFamily: "var(--font-mono)" }}>no tests yet</p>
         <p className="text-zinc-600 text-sm mb-4">complete a typing test to start tracking your progress</p>
         <Link
           to="/"
-          className="inline-block text-sm px-5 py-2 rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
+          className="inline-block text-sm px-5 py-2 rounded bg-[#1a1a1a] text-zinc-300 hover:bg-[#252525] transition-colors"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           take a test
@@ -31,7 +31,7 @@ export function TestHistory({ tests, pagination, onPageChange, isLoading }: Test
       <div className="overflow-x-auto">
         <table className="w-full text-sm" style={{ fontFamily: "var(--font-mono)" }}>
           <thead>
-            <tr className="text-xs uppercase tracking-wider text-zinc-500 border-b border-zinc-800">
+            <tr className="text-xs uppercase tracking-wider text-zinc-500 border-b border-[#1a1a1a]">
               <th className="text-left py-3 font-medium">Date</th>
               <th className="text-right py-3 font-medium">Duration</th>
               <th className="text-right py-3 font-medium">WPM</th>
@@ -42,14 +42,14 @@ export function TestHistory({ tests, pagination, onPageChange, isLoading }: Test
           <tbody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-zinc-800/50">
+                <tr key={i} className="border-b border-[#1a1a1a]/50">
                   {Array.from({ length: 4 }).map((_, j) => (
                     <td key={j} className="py-3">
-                      <div className="h-4 bg-zinc-800 rounded animate-skeleton w-16 ml-auto first:ml-0" />
+                      <div className="h-4 bg-[#1a1a1a] rounded animate-skeleton w-16 ml-auto first:ml-0" />
                     </td>
                   ))}
                   <td className="py-3 hidden md:table-cell">
-                    <div className="h-4 bg-zinc-800 rounded animate-skeleton w-16 ml-auto" />
+                    <div className="h-4 bg-[#1a1a1a] rounded animate-skeleton w-16 ml-auto" />
                   </td>
                 </tr>
               ))
@@ -57,7 +57,7 @@ export function TestHistory({ tests, pagination, onPageChange, isLoading }: Test
               tests.map((test, i) => (
                 <tr
                   key={test.id}
-                  className={`border-b border-zinc-800/50 transition-colors hover:bg-zinc-800/30 ${i % 2 === 0 ? "bg-zinc-900/30" : ""}`}
+                  className={`border-b border-[#1a1a1a]/50 transition-colors hover:bg-[#1a1a1a]/40 ${i % 2 === 0 ? "bg-[#141414]/30" : ""}`}
                 >
                   <td className="py-3 text-zinc-400 text-xs sm:text-sm">{formatDate(test.createdAt)}</td>
                   <td className="py-3 text-right text-zinc-400">{test.duration}s</td>
@@ -76,7 +76,7 @@ export function TestHistory({ tests, pagination, onPageChange, isLoading }: Test
           <button
             onClick={() => onPageChange(pagination.page - 1)}
             disabled={pagination.page <= 1}
-            className="text-sm px-3 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 disabled:text-zinc-700 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors cursor-pointer"
+            className="text-sm px-3 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1a1a]/50 disabled:text-zinc-700 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors cursor-pointer"
           >
             previous
           </button>
@@ -86,7 +86,7 @@ export function TestHistory({ tests, pagination, onPageChange, isLoading }: Test
           <button
             onClick={() => onPageChange(pagination.page + 1)}
             disabled={pagination.page >= pagination.totalPages}
-            className="text-sm px-3 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 disabled:text-zinc-700 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors cursor-pointer"
+            className="text-sm px-3 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1a1a]/50 disabled:text-zinc-700 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors cursor-pointer"
           >
             next
           </button>

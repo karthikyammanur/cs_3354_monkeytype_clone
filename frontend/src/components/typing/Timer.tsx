@@ -15,7 +15,7 @@ export function Timer({ timeRemaining, isActive, isFinished }: TimerProps) {
           : isLow
             ? "text-red-400"
             : isActive
-              ? "text-amber-400"
+              ? "text-[#c4a882]"
               : "text-zinc-500"
       }`}
       style={{ fontFamily: "var(--font-mono)" }}

@@ -6,7 +6,7 @@
 }
 
 body {
-  background-color: #1a1a2e;
+  background-color: #0d0d0d;
   color: #e2e8f0;
   font-family:
     system-ui,
@@ -46,15 +46,15 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: #2a2520;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: #3d362e;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #3f3f46 transparent;
+  scrollbar-color: #2a2520 transparent;
 }

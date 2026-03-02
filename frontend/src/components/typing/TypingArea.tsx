@@ -59,7 +59,7 @@ export function TypingArea({ currentText, currentIndex, charStatuses, isActive, 
 
           let colorClass = "text-zinc-600";
           let bgClass = "";
-          if (status === "correct") colorClass = "text-emerald-400";
+          if (status === "correct") colorClass = "text-[#c4a882]";
           if (status === "incorrect") {
             colorClass = "text-red-400";
             bgClass = "bg-red-400/15";
@@ -72,8 +72,8 @@ export function TypingArea({ currentText, currentIndex, charStatuses, isActive, 
               className={`${colorClass} ${bgClass} ${
                 isCursor
                   ? isActive
-                    ? "border-l-2 border-amber-400"
-                    : "border-l-2 border-amber-400 animate-pulse"
+                    ? "border-l-2 border-[#c4a882]"
+                    : "border-l-2 border-[#c4a882] animate-pulse"
                   : ""
               }`}
             >

@@ -110,7 +110,7 @@ export function Home() {
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
-                      className="w-2 h-2 rounded-full bg-zinc-600 animate-pulse"
+                      className="w-2 h-2 rounded-full bg-[#2a2520] animate-pulse"
                       style={{ animationDelay: `${i * 200}ms` }}
                     />
                   ))}
@@ -121,7 +121,7 @@ export function Home() {
                 <p className="text-red-400/80 text-sm" style={{ fontFamily: "var(--font-mono)" }}>{error}</p>
                 <button
                   onClick={restart}
-                  className="text-sm px-4 py-1.5 rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors cursor-pointer"
+                  className="text-sm px-4 py-1.5 rounded bg-[#1a1a1a] text-zinc-300 hover:bg-[#252525] transition-colors cursor-pointer"
                   style={{ fontFamily: "var(--font-mono)" }}
                 >
                   retry

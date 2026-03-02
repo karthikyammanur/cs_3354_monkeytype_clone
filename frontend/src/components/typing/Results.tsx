@@ -20,7 +20,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
         <div className="flex flex-col items-center">
           <span className="text-zinc-500 text-sm uppercase tracking-wider mb-1">wpm</span>
           <span
-            className="text-5xl sm:text-6xl font-semibold text-amber-400"
+            className="text-5xl sm:text-6xl font-semibold text-[#c4a882]"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             {wpm}
@@ -29,7 +29,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
         <div className="flex flex-col items-center">
           <span className="text-zinc-500 text-sm uppercase tracking-wider mb-1">accuracy</span>
           <span
-            className="text-3xl sm:text-4xl font-semibold text-emerald-400"
+            className="text-3xl sm:text-4xl font-semibold text-[#d4a574]"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             {accuracy}%
@@ -47,7 +47,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
           <p className="text-xs text-zinc-500 animate-pulse">saving...</p>
         )}
         {saveStatus === "saved" && (
-          <p className="text-xs text-emerald-500">result saved</p>
+          <p className="text-xs text-[#d4a574]">result saved</p>
         )}
         {saveStatus === "error" && (
           <p className="text-xs text-red-400">failed to save result</p>
@@ -65,7 +65,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
       <div className="flex flex-wrap justify-center items-center gap-4">
         <button
           onClick={onRestart}
-          className="px-6 py-2 rounded text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-zinc-600"
+          className="px-6 py-2 rounded text-sm text-zinc-300 bg-[#1a1a1a] hover:bg-[#252525] active:bg-[#2a2a2a] transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#2a2520]"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           restart
@@ -73,7 +73,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
         {saveStatus === "saved" && (
           <Link
             to="/profile"
-            className="px-6 py-2 rounded text-sm text-zinc-400 border border-zinc-700 hover:border-zinc-500 hover:text-zinc-200 transition-colors"
+            className="px-6 py-2 rounded text-sm text-zinc-400 border border-[#2a2520] hover:border-[#3d362e] hover:text-zinc-200 transition-colors"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             view profile
@@ -82,7 +82,7 @@ export function Results({ wpm, accuracy, totalChars, correctChars, duration, sav
       </div>
 
       <p className="text-xs text-zinc-700">
-        or press <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">tab</kbd> to restart
+        or press <kbd className="px-1.5 py-0.5 rounded bg-[#1a1a1a] text-zinc-400">tab</kbd> to restart
       </p>
     </div>
   );

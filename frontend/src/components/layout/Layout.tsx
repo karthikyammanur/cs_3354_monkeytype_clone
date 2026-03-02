@@ -3,7 +3,7 @@ import { Navbar } from "./Navbar.tsx";
 
 export function Layout() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#1a1a2e] text-gray-200">
+    <div className="min-h-screen flex flex-col bg-[#0d0d0d] text-gray-200">
       <Navbar />
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pt-20 pb-12">
         <Outlet />
