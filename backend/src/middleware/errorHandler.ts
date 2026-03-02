@@ -1,7 +1,7 @@
-// Centralized error handling middleware
 import { Request, Response, NextFunction } from "express";
 import { env } from "../config/env";
 import { InvalidTokenError, UnauthorizedError } from "express-oauth2-jwt-bearer";
+import { Prisma } from "@prisma/client";
 import { AppError } from "../utils/errors";
 
 export const errorHandler = (
@@ -21,9 +21,26 @@ export const errorHandler = (
     return;
   }
 
-  // JSON parse errors from express.json()
   if (err instanceof SyntaxError && err.status === 400 && err.type === "entity.parse.failed") {
     res.status(400).json({ error: { status: 400, message: "Invalid JSON in request body" } });
+    return;
+  }
+
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (err.code === "P2002") {
+      res.status(409).json({ error: { status: 409, message: "Resource already exists" } });
+      return;
+    }
+    if (err.code === "P2025") {
+      res.status(404).json({ error: { status: 404, message: "Resource not found" } });
+      return;
+    }
+    res.status(500).json({ error: { status: 500, message: "Internal server error" } });
+    return;
+  }
+
+  if (err instanceof Prisma.PrismaClientValidationError) {
+    res.status(400).json({ error: { status: 400, message: "Invalid request data" } });
     return;
   }
 
@@ -32,7 +49,6 @@ export const errorHandler = (
     return;
   }
 
-  // Rate limit errors
   if (err.status === 429) {
     res.status(429).json({ error: { status: 429, message: err.message } });
     return;
