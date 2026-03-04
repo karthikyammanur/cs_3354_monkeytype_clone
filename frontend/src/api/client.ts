@@ -29,6 +29,7 @@ export async function apiFetch<T>(
     throw new Error(body?.error?.message ?? `Request failed with status ${res.status}`);
   }
 
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
 
@@ -56,6 +57,7 @@ export function useApiClient() {
       get: <T>(path: string) => request<T>("GET", path),
       post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
       put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body),
+      del: <T = void>(path: string) => request<T>("DELETE", path),
     }),
     [request]
   );

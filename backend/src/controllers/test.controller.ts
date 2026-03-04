@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
+import { z } from "zod";
 import { TestService } from "../services/test.service";
 import { badRequest } from "../utils/errors";
 import { sanitizeTest } from "../utils/sanitize";
+
+const uuidSchema = z.string().uuid();
 
 const testService = new TestService();
 
@@ -25,6 +28,16 @@ export const getHistory = async (req: Request, res: Response, next: NextFunction
       tests: result.tests.map(sanitizeTest),
       pagination: result.pagination,
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteTest = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const testId = uuidSchema.parse(req.params.id);
+    await testService.deleteTest(req.user!.auth0Id, testId);
+    res.status(204).send();
   } catch (err) {
     next(err);
   }

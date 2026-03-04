@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useLocation } from "react-router-dom";
 import { useApiClient } from "../api/client.ts";
 import { useTypingTest } from "../hooks/useTypingTest.ts";
 import { TimerSelector } from "../components/typing/TimerSelector.tsx";
 import { Timer } from "../components/typing/Timer.tsx";
 import { TypingArea } from "../components/typing/TypingArea.tsx";
 import { Results, type SaveStatus } from "../components/typing/Results.tsx";
+import { FocusOverlay } from "../components/typing/FocusOverlay.tsx";
 
 export function Home() {
   const {
@@ -22,6 +24,7 @@ export function Home() {
     charStatuses,
     isLoading,
     error,
+    liveWpm,
     restart,
     setDuration,
     handleKeyPress,
@@ -31,6 +34,15 @@ export function Home() {
   const api = useApiClient();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const savedRef = useRef(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.restart) {
+      savedRef.current = false;
+      setSaveStatus("idle");
+      restart();
+    }
+  }, [location.state?.restart]);
 
   useEffect(() => {
     if (!isFinished || savedRef.current) return;
@@ -52,6 +64,14 @@ export function Home() {
     setSaveStatus("idle");
     restart();
   }, [restart]);
+
+  const handleDurationChange = useCallback((seconds: number) => {
+    if (isActive) {
+      savedRef.current = false;
+      setSaveStatus("idle");
+    }
+    setDuration(seconds);
+  }, [isActive, setDuration]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -85,6 +105,7 @@ export function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
+      <FocusOverlay isActive={isActive} />
       {isFinished ? (
         <Results
           wpm={wpm}
@@ -99,8 +120,8 @@ export function Home() {
       ) : (
         <>
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            <TimerSelector selected={duration} isActive={isActive} onSelect={setDuration} />
-            <Timer timeRemaining={timeRemaining} isActive={isActive} isFinished={isFinished} />
+            <TimerSelector selected={duration} isActive={isActive} onSelect={handleDurationChange} />
+            <Timer timeRemaining={timeRemaining} isActive={isActive} isFinished={isFinished} liveWpm={liveWpm} />
           </div>
 
           <div className="w-full max-w-3xl">

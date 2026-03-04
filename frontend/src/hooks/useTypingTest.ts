@@ -24,10 +24,12 @@ export function useTypingTest() {
   const [charStatuses, setCharStatuses] = useState<CharStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [liveWpm, setLiveWpm] = useState(0);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isActiveRef = useRef(false);
   const startTimeRef = useRef<number>(0);
+  const correctCharsRef = useRef(0);
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -81,6 +83,10 @@ export function useTypingTest() {
     if (intervalRef.current) return;
     startTimeRef.current = Date.now();
     intervalRef.current = setInterval(() => {
+      const elapsed = (Date.now() - startTimeRef.current) / 1000;
+      if (elapsed > 0) {
+        setLiveWpm(Math.round((correctCharsRef.current / 5) / (elapsed / 60)));
+      }
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           endTest();
@@ -99,7 +105,10 @@ export function useTypingTest() {
         setCharStatuses((statuses) => {
           const updated = [...statuses];
           if (updated[newIndex] === "correct") {
-            setCorrectChars((c) => c - 1);
+            setCorrectChars((c) => {
+              correctCharsRef.current = c - 1;
+              return c - 1;
+            });
           }
           if (updated[newIndex] !== "pending") {
             setTotalChars((t) => t - 1);
@@ -132,7 +141,10 @@ export function useTypingTest() {
         setTyped((t) => t + key);
         setTotalChars((t) => t + 1);
         if (isCorrect) {
-          setCorrectChars((c) => c + 1);
+          setCorrectChars((c) => {
+            correctCharsRef.current = c + 1;
+            return c + 1;
+          });
         }
 
         if (prev + 1 >= text.length) {
@@ -158,15 +170,33 @@ export function useTypingTest() {
     setAccuracy(0);
     setTotalChars(0);
     setCorrectChars(0);
+    setLiveWpm(0);
+    correctCharsRef.current = 0;
     startTimeRef.current = 0;
     fetchWords();
   }, [duration, fetchWords, clearTimer]);
 
   const setDuration = useCallback((seconds: number) => {
-    if (isActiveRef.current) return;
+    const wasActive = isActiveRef.current;
     setDurationState(seconds);
     setTimeRemaining(seconds);
-  }, []);
+    if (wasActive) {
+      clearTimer();
+      setTyped("");
+      setCurrentIndex(0);
+      setIsActive(false);
+      isActiveRef.current = false;
+      setIsFinished(false);
+      setWpm(0);
+      setAccuracy(0);
+      setTotalChars(0);
+      setCorrectChars(0);
+      setLiveWpm(0);
+      correctCharsRef.current = 0;
+      startTimeRef.current = 0;
+      fetchWords();
+    }
+  }, [clearTimer, fetchWords]);
 
   useEffect(() => {
     return () => clearTimer();
@@ -188,6 +218,7 @@ export function useTypingTest() {
     charStatuses,
     isLoading,
     error,
+    liveWpm,
     restart,
     setDuration,
     handleKeyPress,

@@ -3,7 +3,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { requireAuth, extractUser } from "../middleware/auth";
 import { validate } from "../middleware/validate";
-import { createTest, getHistory, getStats } from "../controllers/test.controller";
+import { createTest, getHistory, getStats, deleteTest } from "../controllers/test.controller";
 
 const router = Router();
 
@@ -23,5 +23,6 @@ const historyQuerySchema = z.object({
 router.post("/", requireAuth, extractUser, validate(createTestSchema, "body"), createTest);
 router.get("/", requireAuth, extractUser, validate(historyQuerySchema, "query"), getHistory);
 router.get("/stats", requireAuth, extractUser, getStats);
+router.delete("/:id", requireAuth, extractUser, deleteTest);
 
 export default router;

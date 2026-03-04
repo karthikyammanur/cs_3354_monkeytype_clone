@@ -26,6 +26,12 @@ export class TestRepository {
     return { results, totalCount };
   }
 
+  async deleteById(testId: string, userId: string) {
+    return prisma.typingTest.deleteMany({
+      where: { id: testId, userId },
+    });
+  }
+
   async getStatsByUserId(userId: string) {
     const agg = await prisma.typingTest.aggregate({
       where: { userId },

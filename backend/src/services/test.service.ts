@@ -34,6 +34,14 @@ export class TestService {
     };
   }
 
+  async deleteTest(auth0Id: string, testId: string) {
+    const user = await userRepository.findByAuth0Id(auth0Id);
+    if (!user) throw notFound("User not found");
+
+    const result = await testRepository.deleteById(testId, user.id);
+    if (result.count === 0) throw notFound("Test not found");
+  }
+
   async getStats(auth0Id: string) {
     const user = await userRepository.findByAuth0Id(auth0Id);
     if (!user) throw notFound("User not found");

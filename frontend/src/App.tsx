@@ -8,6 +8,7 @@ import { Home } from "./pages/Home.tsx";
 import { Login } from "./pages/Login.tsx";
 import { Register } from "./pages/Register.tsx";
 import { Profile } from "./pages/Profile.tsx";
+import { About } from "./pages/About.tsx";
 import { NotFound } from "./pages/NotFound.tsx";
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="about" element={<About />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

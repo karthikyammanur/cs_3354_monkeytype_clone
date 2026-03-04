@@ -13,12 +13,11 @@ export function TimerSelector({ selected, isActive, onSelect }: TimerSelectorPro
         <button
           key={d}
           onClick={() => onSelect(d)}
-          disabled={isActive}
           className={`text-sm px-3 py-1.5 min-h-[36px] rounded transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#c4a882]/50 ${
             d === selected
               ? "text-[#c4a882] bg-[#c4a882]/10"
               : isActive
-                ? "text-zinc-700 !cursor-not-allowed"
+                ? "text-zinc-600 hover:text-zinc-400 hover:bg-[#1a1a1a]"
                 : "text-zinc-500 hover:text-zinc-300 hover:bg-[#1a1a1a]"
           }`}
           style={{ fontFamily: "var(--font-mono)" }}
