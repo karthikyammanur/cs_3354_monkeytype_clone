@@ -43,7 +43,7 @@ model Word {
 
 model Sentence {
   id       Int    @id @default(autoincrement())
-  text     String
+  text     String @unique
   category String @default("general")
 
   @@map("sentences")

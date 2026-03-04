@@ -10,7 +10,7 @@ const router = Router();
 const createTestSchema = z.object({
   wpm: z.number().positive(),
   accuracy: z.number().min(0).max(100),
-  duration: z.union([z.literal(15), z.literal(30), z.literal(60), z.literal(120)]),
+  duration: z.number().int().min(1).max(32767),
   totalChars: z.number().positive().int(),
   correctChars: z.number().positive().int(),
 });
