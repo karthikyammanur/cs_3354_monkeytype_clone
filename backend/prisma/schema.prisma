@@ -40,3 +40,11 @@ model Word {
 
   @@map("word_bank")
 }
+
+model Sentence {
+  id       Int    @id @default(autoincrement())
+  text     String
+  category String @default("general")
+
+  @@map("sentences")
+}

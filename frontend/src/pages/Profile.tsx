@@ -12,9 +12,9 @@ function StatsSkeletonGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-lg bg-[#141414] border border-[#1a1a1a] px-6 py-5">
-          <div className="h-3 w-20 bg-[#1a1a1a] rounded animate-skeleton mb-3" />
-          <div className="h-8 w-16 bg-[#1a1a1a] rounded animate-skeleton" />
+        <div key={i} className="rounded-lg bg-[var(--color-card)] border border-[var(--color-border-subtle)] px-6 py-5">
+          <div className="h-3 w-20 bg-[var(--color-skeleton)] rounded animate-skeleton mb-3" />
+          <div className="h-8 w-16 bg-[var(--color-skeleton)] rounded animate-skeleton" />
         </div>
       ))}
     </div>
@@ -53,14 +53,14 @@ function UsernameEditor({ current, onSave }: { current: string; onSave: (name: s
     return (
       <div className="flex items-center gap-3">
         <h1
-          className="text-2xl sm:text-3xl font-semibold text-gray-100"
+          className="text-2xl sm:text-3xl font-semibold text-[var(--color-text)]"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           {current}
         </h1>
         <button
           onClick={() => { setValue(current); setEditing(true); setError(""); }}
-          className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
+          className="text-xs text-[var(--color-muted)] hover:text-[var(--color-secondary-text)] transition-colors cursor-pointer"
         >
           edit
         </button>
@@ -78,19 +78,19 @@ function UsernameEditor({ current, onSave }: { current: string; onSave: (name: s
           onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") setEditing(false); }}
           autoFocus
           maxLength={20}
-          className="text-xl font-semibold text-gray-100 bg-[#1a1a1a] border border-[#2a2520] rounded px-3 py-1 outline-none focus:border-[#c4a882]/50 transition-colors"
+          className="text-xl font-semibold text-[var(--color-text)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded px-3 py-1 outline-none focus:border-[var(--color-primary)]/50 transition-colors"
           style={{ fontFamily: "var(--font-mono)" }}
         />
         <button
           onClick={handleSave}
           disabled={saving}
-          className="text-xs text-[#c4a882] hover:text-[#d4a574] transition-colors cursor-pointer disabled:opacity-50"
+          className="text-xs text-[var(--color-primary)] hover:text-[var(--color-accent)] transition-colors cursor-pointer disabled:opacity-50"
         >
           {saving ? "..." : "save"}
         </button>
         <button
           onClick={() => setEditing(false)}
-          className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
+          className="text-xs text-[var(--color-muted)] hover:text-[var(--color-secondary-text)] transition-colors cursor-pointer"
         >
           cancel
         </button>
@@ -132,7 +132,7 @@ export function Profile() {
         <p className="text-red-400/80 text-sm" style={{ fontFamily: "var(--font-mono)" }}>{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="text-sm px-4 py-1.5 rounded bg-[#1a1a1a] text-zinc-300 hover:bg-[#252525] transition-colors cursor-pointer"
+          className="text-sm px-4 py-1.5 rounded bg-[var(--color-surface)] text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors cursor-pointer"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           retry
@@ -147,7 +147,7 @@ export function Profile() {
         {user?.username && (
           <UsernameEditor current={user.username} onSave={updateUsername} />
         )}
-        <div className="flex flex-wrap gap-2 sm:gap-4 text-sm text-zinc-500">
+        <div className="flex flex-wrap gap-2 sm:gap-4 text-sm text-[var(--color-secondary-text)]">
           <span>{user?.email}</span>
           {user?.createdAt && <span>joined {formatDate(user.createdAt)}</span>}
         </div>
@@ -155,8 +155,8 @@ export function Profile() {
 
       {isLoading && !stats ? <StatsSkeletonGrid /> : stats && <StatsGrid stats={stats} />}
 
-      <div className="rounded-lg bg-[#141414] border border-[#1a1a1a] px-6 py-5">
-        <h2 className="text-sm font-medium text-zinc-400 mb-4" style={{ fontFamily: "var(--font-mono)" }}>
+      <div className="rounded-lg bg-[var(--color-card)] border border-[var(--color-border-subtle)] px-6 py-5">
+        <h2 className="text-sm font-medium text-[var(--color-secondary-text)] mb-4" style={{ fontFamily: "var(--font-mono)" }}>
           security settings
         </h2>
         <div className="flex flex-col gap-3">
@@ -164,22 +164,22 @@ export function Profile() {
             <button
               onClick={handlePasswordReset}
               disabled={resetSent}
-              className="text-sm px-4 py-1.5 rounded bg-[#1a1a1a] border border-[#2a2520] text-zinc-300 hover:bg-[#252525] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-sm px-4 py-1.5 rounded bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ fontFamily: "var(--font-mono)" }}
             >
               {resetSent ? "reset email sent" : "change password"}
             </button>
             {resetError && <span className="text-xs text-red-400">{resetError}</span>}
-            {resetSent && <span className="text-xs text-[#d4a574]">check your email</span>}
+            {resetSent && <span className="text-xs text-[var(--color-accent)]">check your email</span>}
           </div>
-          <p className="text-xs text-zinc-600">
+          <p className="text-xs text-[var(--color-muted)]">
             email changes: contact support
           </p>
         </div>
       </div>
 
       <div>
-        <h2 className="text-lg font-medium text-gray-200 mb-4" style={{ fontFamily: "var(--font-mono)" }}>
+        <h2 className="text-lg font-medium text-[var(--color-text)] mb-4" style={{ fontFamily: "var(--font-mono)" }}>
           test history
         </h2>
         <TestHistory

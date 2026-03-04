@@ -1,20 +1,20 @@
-const DURATIONS = [15, 30, 60, 120] as const;
+const WORD_COUNTS = [10, 25, 50, 100] as const;
 
-interface TimerSelectorProps {
+interface WordCountSelectorProps {
   selected: number;
   isActive: boolean;
-  onSelect: (duration: number) => void;
+  onSelect: (count: number) => void;
 }
 
-export function TimerSelector({ selected, isActive, onSelect }: TimerSelectorProps) {
+export function WordCountSelector({ selected, isActive, onSelect }: WordCountSelectorProps) {
   return (
     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-      {DURATIONS.map((d) => (
+      {WORD_COUNTS.map((c) => (
         <button
-          key={d}
-          onClick={() => onSelect(d)}
+          key={c}
+          onClick={() => onSelect(c)}
           className={`text-sm px-3 py-1.5 min-h-[36px] rounded transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/50 ${
-            d === selected
+            c === selected
               ? "text-[var(--color-primary)] bg-[var(--color-primary)]/10"
               : isActive
                 ? "text-[var(--color-muted)] hover:text-[var(--color-secondary-text)] hover:bg-[var(--color-surface)]"
@@ -22,7 +22,7 @@ export function TimerSelector({ selected, isActive, onSelect }: TimerSelectorPro
           }`}
           style={{ fontFamily: "var(--font-mono)" }}
         >
-          {d}
+          {c}
         </button>
       ))}
     </div>

@@ -3,7 +3,10 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom";
 import { useApiClient } from "../api/client.ts";
 import { useTypingTest } from "../hooks/useTypingTest.ts";
+import { useSound } from "../hooks/useSound.ts";
+import { ModeSelector } from "../components/typing/ModeSelector.tsx";
 import { TimerSelector } from "../components/typing/TimerSelector.tsx";
+import { WordCountSelector } from "../components/typing/WordCountSelector.tsx";
 import { Timer } from "../components/typing/Timer.tsx";
 import { TypingArea } from "../components/typing/TypingArea.tsx";
 import { Results, type SaveStatus } from "../components/typing/Results.tsx";
@@ -17,6 +20,7 @@ export function Home() {
     isFinished,
     duration,
     timeRemaining,
+    elapsedTime,
     wpm,
     accuracy,
     totalChars,
@@ -25,8 +29,12 @@ export function Home() {
     isLoading,
     error,
     liveWpm,
+    testMode,
+    wordCount,
     restart,
     setDuration,
+    setTestMode,
+    setWordCount,
     handleKeyPress,
   } = useTypingTest();
 
@@ -35,6 +43,7 @@ export function Home() {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const savedRef = useRef(false);
   const location = useLocation();
+  const { playClick, playError, playComplete } = useSound();
 
   useEffect(() => {
     if (location.state?.restart) {
@@ -44,8 +53,12 @@ export function Home() {
     }
   }, [location.state?.restart]);
 
+  const saveDuration = testMode === "words" ? elapsedTime : duration;
+
   useEffect(() => {
     if (!isFinished || savedRef.current) return;
+
+    playComplete();
 
     if (!isAuthenticated) {
       setSaveStatus("guest");
@@ -54,10 +67,12 @@ export function Home() {
 
     savedRef.current = true;
     setSaveStatus("saving");
-    api.post("/tests", { wpm, accuracy, duration, totalChars, correctChars })
+
+    const clampedDuration = Math.min(Math.max(saveDuration, 1), 32767);
+    api.post("/tests", { wpm, accuracy, duration: clampedDuration, totalChars, correctChars })
       .then(() => setSaveStatus("saved"))
       .catch(() => setSaveStatus("error"));
-  }, [isFinished, isAuthenticated, api, wpm, accuracy, duration, totalChars, correctChars]);
+  }, [isFinished, isAuthenticated, api, wpm, accuracy, saveDuration, totalChars, correctChars, playComplete]);
 
   const handleRestart = useCallback(() => {
     savedRef.current = false;
@@ -72,6 +87,14 @@ export function Home() {
     }
     setDuration(seconds);
   }, [isActive, setDuration]);
+
+  const handleWordCountChange = useCallback((count: number) => {
+    if (isActive) {
+      savedRef.current = false;
+      setSaveStatus("idle");
+    }
+    setWordCount(count);
+  }, [isActive, setWordCount]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -95,13 +118,22 @@ export function Home() {
       }
 
       if (e.key.length === 1) {
+        const charIndex = currentIndex;
+        const expected = currentText[charIndex];
+        if (expected !== undefined) {
+          if (e.key === expected) {
+            playClick();
+          } else {
+            playError();
+          }
+        }
         handleKeyPress(e.key);
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isFinished, handleKeyPress, handleRestart]);
+  }, [isFinished, handleKeyPress, handleRestart, currentIndex, currentText, playClick, playError]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
@@ -113,15 +145,32 @@ export function Home() {
           totalChars={totalChars}
           correctChars={correctChars}
           duration={duration}
+          elapsedTime={elapsedTime}
+          testMode={testMode}
+          wordCount={wordCount}
           saveStatus={saveStatus}
           onRestart={handleRestart}
           onLogin={() => loginWithRedirect()}
         />
       ) : (
         <>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            <TimerSelector selected={duration} isActive={isActive} onSelect={handleDurationChange} />
-            <Timer timeRemaining={timeRemaining} isActive={isActive} isFinished={isFinished} liveWpm={liveWpm} />
+          <div className="flex flex-col items-center gap-3">
+            <ModeSelector selected={testMode} isActive={isActive} onSelect={setTestMode} />
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+              {testMode === "words" ? (
+                <WordCountSelector selected={wordCount} isActive={isActive} onSelect={handleWordCountChange} />
+              ) : (
+                <TimerSelector selected={duration} isActive={isActive} onSelect={handleDurationChange} />
+              )}
+              <Timer
+                timeRemaining={timeRemaining}
+                elapsedTime={elapsedTime}
+                isActive={isActive}
+                isFinished={isFinished}
+                liveWpm={liveWpm}
+                testMode={testMode}
+              />
+            </div>
           </div>
 
           <div className="w-full max-w-3xl">
@@ -131,7 +180,7 @@ export function Home() {
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
-                      className="w-2 h-2 rounded-full bg-[#2a2520] animate-pulse"
+                      className="w-2 h-2 rounded-full bg-[var(--color-border)] animate-pulse"
                       style={{ animationDelay: `${i * 200}ms` }}
                     />
                   ))}
@@ -142,7 +191,7 @@ export function Home() {
                 <p className="text-red-400/80 text-sm" style={{ fontFamily: "var(--font-mono)" }}>{error}</p>
                 <button
                   onClick={restart}
-                  className="text-sm px-4 py-1.5 rounded bg-[#1a1a1a] text-zinc-300 hover:bg-[#252525] transition-colors cursor-pointer"
+                  className="text-sm px-4 py-1.5 rounded bg-[var(--color-surface)] text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors cursor-pointer"
                   style={{ fontFamily: "var(--font-mono)" }}
                 >
                   retry
@@ -160,7 +209,7 @@ export function Home() {
           </div>
 
           {!isActive && !isLoading && !error && (
-            <p className="text-zinc-600 text-sm" style={{ fontFamily: "var(--font-mono)" }}>
+            <p className="text-[var(--color-muted)] text-sm" style={{ fontFamily: "var(--font-mono)" }}>
               start typing to begin
             </p>
           )}

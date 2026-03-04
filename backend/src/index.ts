@@ -9,6 +9,7 @@ import morgan from "morgan";
 import userRoutes from "./routes/user.routes";
 import testRoutes from "./routes/test.routes";
 import wordRoutes from "./routes/word.routes";
+import sentenceRoutes from "./routes/sentence.routes";
 import { errorHandler } from "./middleware/errorHandler";
 import { generalLimiter, wordsLimiter } from "./middleware/rateLimiter";
 
@@ -46,6 +47,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/words", wordsLimiter, wordRoutes);
+app.use("/api/sentences", wordsLimiter, sentenceRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: { status: 404, message: "Route not found" } });

@@ -57,25 +57,28 @@ export function TypingArea({ currentText, currentIndex, charStatuses, isActive, 
           const status = charStatuses[i] ?? "pending";
           const isCursor = i === currentIndex && !isFinished;
 
-          let colorClass = "text-zinc-600";
-          let bgClass = "";
-          if (status === "correct") colorClass = "text-[#c4a882]";
-          if (status === "incorrect") {
-            colorClass = "text-red-400";
-            bgClass = "bg-red-400/15";
+          const style: React.CSSProperties = {};
+          if (status === "correct") {
+            style.color = "var(--color-correct)";
+          } else if (status === "incorrect") {
+            style.color = "var(--color-incorrect)";
+            style.backgroundColor = "var(--color-incorrect-bg)";
+          } else {
+            style.color = "var(--color-pending)";
           }
 
           return (
             <span
               key={i}
               ref={isCursor ? cursorRef : undefined}
-              className={`${colorClass} ${bgClass} ${
+              style={style}
+              className={
                 isCursor
                   ? isActive
-                    ? "border-l-2 border-[#c4a882]"
-                    : "border-l-2 border-[#c4a882] animate-pulse"
+                    ? "border-l-2 border-[var(--color-cursor)]"
+                    : "border-l-2 border-[var(--color-cursor)] animate-pulse"
                   : ""
-              }`}
+              }
             >
               {char}
             </span>

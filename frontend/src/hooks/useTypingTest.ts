@@ -3,20 +3,24 @@ import { publicFetch } from "../api/client.ts";
 import { calculateWPM, calculateAccuracy } from "../utils/scoring.ts";
 
 type CharStatus = "correct" | "incorrect" | "pending";
+export type TestMode = "time" | "words" | "sentences";
 
 interface WordsResponse {
   words: string[];
 }
 
+interface SentencesResponse {
+  sentences: string[];
+}
+
 export function useTypingTest() {
-  const [words, setWords] = useState<string[]>([]);
   const [currentText, setCurrentText] = useState("");
-  const [typed, setTyped] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [duration, setDurationState] = useState(30);
   const [timeRemaining, setTimeRemaining] = useState(30);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
@@ -25,11 +29,14 @@ export function useTypingTest() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [liveWpm, setLiveWpm] = useState(0);
+  const [testMode, setTestModeState] = useState<TestMode>("time");
+  const [wordCount, setWordCountState] = useState(25);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isActiveRef = useRef(false);
   const startTimeRef = useRef<number>(0);
   const correctCharsRef = useRef(0);
+  const testModeRef = useRef<TestMode>("time");
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -38,18 +45,25 @@ export function useTypingTest() {
     }
   }, []);
 
-  const fetchWords = useCallback(async () => {
+  const fetchContent = useCallback(async (mode: TestMode, wc: number) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await publicFetch<WordsResponse>("/words?count=200");
-      const text = data.words.join(" ");
-      setWords(data.words);
+      let text: string;
+      if (mode === "sentences") {
+        const data = await publicFetch<SentencesResponse>("/sentences?count=10");
+        text = data.sentences.join(" ");
+      } else if (mode === "words") {
+        const data = await publicFetch<WordsResponse>(`/words?count=${wc}`);
+        text = data.words.join(" ");
+      } else {
+        const data = await publicFetch<WordsResponse>("/words?count=200");
+        text = data.words.join(" ");
+      }
       setCurrentText(text);
       setCharStatuses(new Array(text.length).fill("pending"));
     } catch (e) {
-      setError((e as Error).message || "Failed to load words");
-      setWords([]);
+      setError((e as Error).message || "Failed to load content");
       setCurrentText("");
       setCharStatuses([]);
     } finally {
@@ -58,8 +72,8 @@ export function useTypingTest() {
   }, []);
 
   useEffect(() => {
-    fetchWords();
-  }, [fetchWords]);
+    fetchContent(testMode, wordCount);
+  }, []);
 
   const endTest = useCallback((elapsedOverride?: number) => {
     clearTimer();
@@ -67,7 +81,12 @@ export function useTypingTest() {
     isActiveRef.current = false;
     setIsFinished(true);
 
-    const elapsed = elapsedOverride ?? duration;
+    const mode = testModeRef.current;
+    const elapsed = elapsedOverride ?? (mode === "words"
+      ? Math.max(1, Math.round((Date.now() - startTimeRef.current) / 1000))
+      : duration);
+
+    setElapsedTime(elapsed);
 
     setTotalChars((prevTotal) => {
       setCorrectChars((prevCorrect) => {
@@ -87,13 +106,18 @@ export function useTypingTest() {
       if (elapsed > 0) {
         setLiveWpm(Math.round((correctCharsRef.current / 5) / (elapsed / 60)));
       }
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          endTest();
-          return 0;
-        }
-        return prev - 1;
-      });
+
+      if (testModeRef.current === "words") {
+        setElapsedTime(Math.round(elapsed));
+      } else {
+        setTimeRemaining((prev) => {
+          if (prev <= 1) {
+            endTest();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }
     }, 1000);
   }, [endTest]);
 
@@ -116,7 +140,6 @@ export function useTypingTest() {
           updated[newIndex] = "pending";
           return updated;
         });
-        setTyped((t) => t.slice(0, -1));
         return newIndex;
       });
       return;
@@ -138,7 +161,6 @@ export function useTypingTest() {
           updated[prev] = isCorrect ? "correct" : "incorrect";
           return updated;
         });
-        setTyped((t) => t + key);
         setTotalChars((t) => t + 1);
         if (isCorrect) {
           setCorrectChars((c) => {
@@ -158,59 +180,73 @@ export function useTypingTest() {
     });
   }, [startTimer, endTest]);
 
-  const restart = useCallback(() => {
+  const resetState = useCallback(() => {
     clearTimer();
-    setTyped("");
     setCurrentIndex(0);
     setIsActive(false);
     isActiveRef.current = false;
     setIsFinished(false);
-    setTimeRemaining(duration);
     setWpm(0);
     setAccuracy(0);
     setTotalChars(0);
     setCorrectChars(0);
     setLiveWpm(0);
+    setElapsedTime(0);
     correctCharsRef.current = 0;
     startTimeRef.current = 0;
-    fetchWords();
-  }, [duration, fetchWords, clearTimer]);
+  }, [clearTimer]);
+
+  const restart = useCallback(() => {
+    resetState();
+    setTimeRemaining(duration);
+    fetchContent(testModeRef.current, wordCount);
+  }, [duration, wordCount, fetchContent, resetState]);
 
   const setDuration = useCallback((seconds: number) => {
     const wasActive = isActiveRef.current;
     setDurationState(seconds);
     setTimeRemaining(seconds);
     if (wasActive) {
-      clearTimer();
-      setTyped("");
-      setCurrentIndex(0);
-      setIsActive(false);
-      isActiveRef.current = false;
-      setIsFinished(false);
-      setWpm(0);
-      setAccuracy(0);
-      setTotalChars(0);
-      setCorrectChars(0);
-      setLiveWpm(0);
-      correctCharsRef.current = 0;
-      startTimeRef.current = 0;
-      fetchWords();
+      resetState();
+      setTimeRemaining(seconds);
+      fetchContent(testModeRef.current, wordCount);
     }
-  }, [clearTimer, fetchWords]);
+  }, [resetState, fetchContent, wordCount]);
+
+  const setTestMode = useCallback((mode: TestMode) => {
+    if (isActiveRef.current) return;
+    testModeRef.current = mode;
+    setTestModeState(mode);
+    resetState();
+    if (mode === "words") {
+      setTimeRemaining(0);
+    } else {
+      setTimeRemaining(duration);
+    }
+    fetchContent(mode, wordCount);
+  }, [resetState, fetchContent, wordCount, duration]);
+
+  const setWordCount = useCallback((count: number) => {
+    const wasActive = isActiveRef.current;
+    setWordCountState(count);
+    if (wasActive) {
+      resetState();
+    }
+    fetchContent("words", count);
+  }, [resetState, fetchContent]);
 
   useEffect(() => {
     return () => clearTimer();
   }, [clearTimer]);
 
   return {
-    words,
     currentText,
-    typed,
     currentIndex,
     isActive,
     isFinished,
     duration,
     timeRemaining,
+    elapsedTime,
     wpm,
     accuracy,
     totalChars,
@@ -219,8 +255,12 @@ export function useTypingTest() {
     isLoading,
     error,
     liveWpm,
+    testMode,
+    wordCount,
     restart,
     setDuration,
+    setTestMode,
+    setWordCount,
     handleKeyPress,
   };
 }

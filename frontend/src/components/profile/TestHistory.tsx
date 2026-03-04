@@ -27,12 +27,12 @@ export function TestHistory({ tests, pagination, onPageChange, onDelete, isLoadi
 
   if (!isLoading && tests.length === 0) {
     return (
-      <div className="text-center py-16 rounded-lg border border-[#1a1a1a] bg-[#141414]/50">
-        <p className="text-zinc-400 text-lg mb-2" style={{ fontFamily: "var(--font-mono)" }}>no tests yet</p>
-        <p className="text-zinc-600 text-sm mb-4">complete a typing test to start tracking your progress</p>
+      <div className="text-center py-16 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-card)]/50">
+        <p className="text-[var(--color-secondary-text)] text-lg mb-2" style={{ fontFamily: "var(--font-mono)" }}>no tests yet</p>
+        <p className="text-[var(--color-muted)] text-sm mb-4">complete a typing test to start tracking your progress</p>
         <Link
           to="/"
-          className="inline-block text-sm px-5 py-2 rounded bg-[#1a1a1a] text-zinc-300 hover:bg-[#252525] transition-colors"
+          className="inline-block text-sm px-5 py-2 rounded bg-[var(--color-surface)] text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           take a test
@@ -46,7 +46,7 @@ export function TestHistory({ tests, pagination, onPageChange, onDelete, isLoadi
       <div className="overflow-x-auto">
         <table className="w-full text-sm" style={{ fontFamily: "var(--font-mono)" }}>
           <thead>
-            <tr className="text-xs uppercase tracking-wider text-zinc-500 border-b border-[#1a1a1a]">
+            <tr className="text-xs uppercase tracking-wider text-[var(--color-secondary-text)] border-b border-[var(--color-border-subtle)]">
               <th className="text-left py-3 font-medium">Date</th>
               <th className="text-right py-3 font-medium">Duration</th>
               <th className="text-right py-3 font-medium">WPM</th>
@@ -58,14 +58,14 @@ export function TestHistory({ tests, pagination, onPageChange, onDelete, isLoadi
           <tbody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-[#1a1a1a]/50">
+                <tr key={i} className="border-b border-[var(--color-border-subtle)]/50">
                   {Array.from({ length: 4 }).map((_, j) => (
                     <td key={j} className="py-3">
-                      <div className="h-4 bg-[#1a1a1a] rounded animate-skeleton w-16 ml-auto first:ml-0" />
+                      <div className="h-4 bg-[var(--color-skeleton)] rounded animate-skeleton w-16 ml-auto first:ml-0" />
                     </td>
                   ))}
                   <td className="py-3 hidden md:table-cell">
-                    <div className="h-4 bg-[#1a1a1a] rounded animate-skeleton w-16 ml-auto" />
+                    <div className="h-4 bg-[var(--color-skeleton)] rounded animate-skeleton w-16 ml-auto" />
                   </td>
                   <td className="py-3" />
                 </tr>
@@ -74,13 +74,13 @@ export function TestHistory({ tests, pagination, onPageChange, onDelete, isLoadi
               tests.map((test, i) => (
                 <tr
                   key={test.id}
-                  className={`border-b border-[#1a1a1a]/50 transition-colors hover:bg-[#1a1a1a]/40 ${i % 2 === 0 ? "bg-[#141414]/30" : ""}`}
+                  className={`border-b border-[var(--color-border-subtle)]/50 transition-colors hover:bg-[var(--color-surface)]/40 ${i % 2 === 0 ? "bg-[var(--color-card)]/30" : ""}`}
                 >
-                  <td className="py-3 text-zinc-400 text-xs sm:text-sm">{formatDate(test.createdAt)}</td>
-                  <td className="py-3 text-right text-zinc-400">{test.duration}s</td>
-                  <td className="py-3 text-right text-gray-200">{Math.round(test.wpm)}</td>
-                  <td className="py-3 text-right text-gray-200">{Math.round(test.accuracy * 10) / 10}%</td>
-                  <td className="py-3 text-right text-zinc-400 hidden md:table-cell">{test.correctChars}/{test.totalChars}</td>
+                  <td className="py-3 text-[var(--color-secondary-text)] text-xs sm:text-sm">{formatDate(test.createdAt)}</td>
+                  <td className="py-3 text-right text-[var(--color-secondary-text)]">{test.duration}s</td>
+                  <td className="py-3 text-right text-[var(--color-text)]">{Math.round(test.wpm)}</td>
+                  <td className="py-3 text-right text-[var(--color-text)]">{Math.round(test.accuracy * 10) / 10}%</td>
+                  <td className="py-3 text-right text-[var(--color-secondary-text)] hidden md:table-cell">{test.correctChars}/{test.totalChars}</td>
                   <td className="py-3 text-center">
                     {confirmId === test.id ? (
                       <span className="flex items-center gap-1 justify-end">
@@ -91,10 +91,10 @@ export function TestHistory({ tests, pagination, onPageChange, onDelete, isLoadi
                         >
                           {deleting ? "..." : "yes"}
                         </button>
-                        <span className="text-zinc-600">/</span>
+                        <span className="text-[var(--color-muted)]">/</span>
                         <button
                           onClick={() => setConfirmId(null)}
-                          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+                          className="text-xs text-[var(--color-secondary-text)] hover:text-[var(--color-text)] transition-colors cursor-pointer"
                         >
                           no
                         </button>
@@ -102,7 +102,7 @@ export function TestHistory({ tests, pagination, onPageChange, onDelete, isLoadi
                     ) : (
                       <button
                         onClick={() => setConfirmId(test.id)}
-                        className="text-zinc-700 hover:text-red-400 transition-colors cursor-pointer p-1"
+                        className="text-[var(--color-muted)] hover:text-red-400 transition-colors cursor-pointer p-1"
                         title="Delete test"
                       >
                         &#x2715;
@@ -121,17 +121,17 @@ export function TestHistory({ tests, pagination, onPageChange, onDelete, isLoadi
           <button
             onClick={() => onPageChange(pagination.page - 1)}
             disabled={pagination.page <= 1}
-            className="text-sm px-3 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1a1a]/50 disabled:text-zinc-700 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors cursor-pointer"
+            className="text-sm px-3 py-1.5 rounded text-[var(--color-secondary-text)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)]/50 disabled:text-[var(--color-muted)] disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors cursor-pointer"
           >
             previous
           </button>
-          <span className="text-xs text-zinc-500" style={{ fontFamily: "var(--font-mono)" }}>
+          <span className="text-xs text-[var(--color-secondary-text)]" style={{ fontFamily: "var(--font-mono)" }}>
             {pagination.page} / {pagination.totalPages}
           </span>
           <button
             onClick={() => onPageChange(pagination.page + 1)}
             disabled={pagination.page >= pagination.totalPages}
-            className="text-sm px-3 py-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1a1a]/50 disabled:text-zinc-700 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors cursor-pointer"
+            className="text-sm px-3 py-1.5 rounded text-[var(--color-secondary-text)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)]/50 disabled:text-[var(--color-muted)] disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors cursor-pointer"
           >
             next
           </button>
